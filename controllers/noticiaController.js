@@ -24,7 +24,6 @@ exports.create = async (req, res) => {
 
 exports.delete = async (req, res) => {
   const newsId = req.params.id;
-  console.log('<,,,,>',newsId);
   const deleted = await Noticia.findByIdAndDelete(newsId);
   if (!deleted) return res.status(404).json({ error: "Notícia não encontrada" });
   res.json({ message: "Notícia deletada" });
