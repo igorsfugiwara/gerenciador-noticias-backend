@@ -46,8 +46,10 @@ PORT=5000
 - Listagem de notícias: Exibe as notícias cadastradas de forma organizada.
 
 ## 🔗 Repositório Front-End
-O front-end deste projeto está disponível em: https://github.com/igorsfugiwara/gerenciador-de-noticias.
+O front-end deste projeto está disponível em: https://github.com/igorsfugiwara/gerenciador-de-noticias .
 
+#
+#
 # 🐳 Execução com Docker
 Para facilitar a configuração e execução do projeto, você pode utilizar o Docker e o Docker Compose. Siga os passos abaixo:
 
