@@ -2,7 +2,7 @@ const Noticia = require("../models/Noticia");
 
 exports.getAll = async (req, res) => {
   try {
-    const noticias = await Noticia.find().select('_id id url titulo data_hora_publicacao');
+    const noticias = await Noticia.find();
     res.json(noticias);
   } catch (err) {
     res.status(500).json({ erro: 'Erro ao buscar notícias' });
