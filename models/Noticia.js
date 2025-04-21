@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const NoticiaSchema = new mongoose.Schema({
-  id: Number,
+  id: { type: Number, required: true, unique: true },
   editoria: String,
   url: String,
   titulo: String,

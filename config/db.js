@@ -1,37 +1,43 @@
-const noticaModel = require('../models/Noticia.js');
-const noticas = require('../noticias.json');
 // config/db.js
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
+require('dotenv').config();
+const mongoose = require('mongoose');
+const NoticiaModel = require('../models/Noticia');
+const seedData = require('../noticias.json');
 
-dotenv.config();
-
-const connectDB = async () => {
+async function seedDatabase() {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log("🟢 MongoDB conectado");
-    configDB()
-  } catch (error) {
-    console.error("❌ Erro ao conectar no MongoDB", error);
-    process.exit(1);
-  }
-};
-
-const configDB = async () => {
-  try {
-    const totalNoticias = await noticaModel.countDocuments();
-
-    if (totalNoticias === 0) {
-      console.log('📭 Nenhuma notícia encontrada. Inserindo...');
-      await noticaModel.insertMany(noticas);
+    const count = await NoticiaModel.countDocuments();
+    if (count === 0) {
+      console.log('📭 Nenhuma notícia encontrada. Inserindo seed...');
+      await NoticiaModel.insertMany(seedData);
       console.log('✅ Notícias inseridas com sucesso.');
     } else {
-      console.log(`📚 Já existem ${totalNoticias} notícias. Nenhuma inserção feita.`);
+      console.log(`📚 Já existem ${count} notícias. Seed não foi executada.`);
     }
   } catch (err) {
-    console.error("❌ Erro ao configurar o banco de dados:", err);
+    console.error('❌ Erro no seed do banco:', err);
   }
-};
+}
 
+async function connectDB() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    if (process.env.NODE_ENV !== 'test') {
+      console.log('🟢 MongoDB conectado');
+    }
+    // Só faça seed fora de test
+    if (process.env.NODE_ENV !== 'test') {
+      await seedDatabase();
+    }
+  } catch (err) {
+    if (process.env.NODE_ENV !== 'test') {
+      console.error('❌ Erro ao conectar no MongoDB', err);
+    }
+    throw err;
+  }
+}
 
 module.exports = connectDB;
