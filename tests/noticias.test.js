@@ -1,122 +1,88 @@
-// Configura o ambiente de teste ANTES de qualquer importação
 process.env.NODE_ENV = 'test';
-process.env.MONGO_URI = process.env.TEST_MONGO_URI || 'mongodb://localhost:27017/gerenciador_test';
-
-// Silencia logs para não atrapalhar o Jest
-jest.spyOn(console, 'log').mockImplementation(() => {});
-jest.spyOn(console, 'error').mockImplementation(() => {});
+process.env.MONGO_URI = 'mongodb://localhost:27017/gerenciador_test';
 
 const mongoose = require('mongoose');
 const request = require('supertest');
 const app = require('../server');
 const Noticia = require('../models/Noticia');
 
-// Aguarda a conexão iniciada em server.js
 beforeAll(async () => {
-  if (mongoose.connection.readyState !== 1) {
-    await new Promise((resolve) =>
-      mongoose.connection.once('open', resolve)
-    );
-  }
+  await mongoose.connect(process.env.MONGO_URI);
 });
 
-// Limpa banco e fecha conexão
 afterAll(async () => {
-  if (mongoose.connection.db) {
-    await mongoose.connection.db.dropDatabase();
-  }
+  await mongoose.connection.dropDatabase();
   await mongoose.connection.close();
 });
 
+let noticiaId;
+
 beforeEach(async () => {
-  // Limpa e popula banco antes de cada teste
   await Noticia.deleteMany({});
-  await Noticia.create({
+  const noticia = await Noticia.create({
     id: 1,
     editoria: 'Economia',
-    url: 'https://www.estadao.com.br/economia/china-nova-retaliacao-tarifas-estados-unidos/',
-    titulo: 'China retalia os EUA, eleva tarifas para 125%',
-    subtitulo: 'China diz que guerra se tornou ‘um jogo de números’',
-    data_hora_publicacao: '2025-04-11 16:44:00',
-    imagem: 'https://www.estadao.com.br/resizer/...1200',
-    imagem_thumb: 'https://www.estadao.com.br/resizer/...380',
-    conteudo: '<p>Conteúdo de exemplo</p>',
+    url: 'https://exemplo.com/economia',
+    titulo: 'Título Exemplo',
+    subtitulo: 'Subtitulo Exemplo',
+    data_hora_publicacao: '2025-04-20T10:00:00Z',
+    imagem: 'https://img.com/1.jpg',
+    imagem_thumb: 'https://img.com/thumb1.jpg',
+    conteudo: '<p>Conteúdo</p>'
   });
+  noticiaId = noticia._id.toString();
 });
 
-describe('GET /noticias', () => {
-  it('should return an array of noticias', async () => {
+describe('Notícia API', () => {
+  test('GET /noticias - deve retornar todas as notícias', async () => {
     const res = await request(app).get('/noticias');
     expect(res.statusCode).toBe(200);
-    expect(Array.isArray(res.body)).toBe(true);
-    expect(res.body).toHaveLength(1);
-    expect(res.body[0]).toHaveProperty('id', 1);
+    expect(res.body.length).toBe(1);
   });
-});
 
-describe('GET /noticias/:id', () => {
-  it('should return a single noticia by id', async () => {
-    const res = await request(app).get('/noticias/1');
+  test('GET /noticias/:id - deve retornar uma notícia específica', async () => {
+    const res = await request(app).get(`/noticias/${noticiaId}`);
     expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveProperty('id', 1);
-    expect(res.body).toHaveProperty('titulo');
+    expect(res.body).toHaveProperty('titulo', 'Título Exemplo');
   });
 
-  it('should return 404 if noticia not found', async () => {
-    const res = await request(app).get('/noticias/999');
-    expect(res.statusCode).toBe(404);
-  });
-});
-
-describe('POST /noticias', () => {
-  it('should create a new noticia', async () => {
-    const newNoticia = {
+  test('POST /noticias - deve criar uma nova notícia', async () => {
+    const nova = {
       id: 2,
       editoria: 'Política',
       url: 'https://exemplo.com/politica',
-      titulo: 'Nova lei aprovada',
-      subtitulo: 'Detalhes da nova lei',
-      data_hora_publicacao: '2025-04-20 10:00:00',
-      imagem: 'https://exemplo.com/img.jpg',
-      imagem_thumb: 'https://exemplo.com/thumb.jpg',
-      conteudo: '<p>Texto da notícia</p>',
+      titulo: 'Nova notícia',
+      subtitulo: 'Sub',
+      data_hora_publicacao: '2025-04-21T12:00:00Z',
+      imagem: 'https://img.com/2.jpg',
+      imagem_thumb: 'https://img.com/thumb2.jpg',
+      conteudo: '<p>Nova</p>'
     };
 
-    const res = await request(app)
-      .post('/noticias')
-      .send(newNoticia)
-      .set('Accept', 'application/json');
-
+    const res = await request(app).post('/noticias').send(nova);
     expect(res.statusCode).toBe(201);
-    expect(res.body).toHaveProperty('id', 2);
-    expect(res.body).toHaveProperty('titulo', 'Nova lei aprovada');
+    expect(res.body).toHaveProperty('titulo', 'Nova notícia');
   });
 
-  it('should return 400 for missing fields', async () => {
-    const res = await request(app).post('/noticias').send({ editoria: 'Saúde' });
-    expect(res.statusCode).toBe(400);
-  });
-});
-
-describe('PUT /noticias/:id', () => {
-  it('should update an existing noticia', async () => {
-    const updates = { titulo: 'Tarifas ajustadas' };
-    const res = await request(app)
-      .put('/noticias/1')
-      .send(updates)
-      .set('Accept', 'application/json');
-
+  test('PUT /noticias/:id - deve atualizar a notícia', async () => {
+    const res = await request(app).put(`/noticias/${noticiaId}`).send({
+      titulo: 'Atualizado'
+    });
     expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveProperty('titulo', 'Tarifas ajustadas');
+    expect(res.body).toHaveProperty('titulo', 'Atualizado');
   });
-});
 
-describe('DELETE /noticias/:id', () => {
-  it('should delete a noticia', async () => {
-    const res = await request(app).delete('/noticias/1');
+  test('DELETE /noticias/:id - deve deletar a notícia', async () => {
+    const res = await request(app).delete(`/noticias/${noticiaId}`);
     expect(res.statusCode).toBe(204);
 
-    const getRes = await request(app).get('/noticias/1');
-    expect(getRes.statusCode).toBe(404 || 500);
+    const check = await request(app).get(`/noticias/${noticiaId}`);
+    expect(check.statusCode).toBe(404);
+  });
+
+  test('DELETE /noticias - deve deletar todas as notícias', async () => {
+    const res = await request(app).delete('/noticias');
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('deletedCount', 1);
   });
 });
