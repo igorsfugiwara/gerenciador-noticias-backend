@@ -3,11 +3,16 @@
 Este repositório contém a API que serve como backend para o projeto de gerenciamento de notícias. Desenvolvida com **Node.js**, **Express**, **MongoDB** e **Mongoose**, oferece uma estrutura sólida e escalável para o gerenciamento de dados.
 
 ## 🚀 Tecnologias Utilizadas
+- **[![Node.js](https://img.shields.io/badge/Node.js-v18.x-green)](https://nodejs.org/)** : Ambiente de execução JavaScript no lado do servidor, permitindo a construção de aplicações escaláveis e de alto desempenho.
+- **[![Express](https://img.shields.io/badge/Express.js-4.x-blue)](https://expressjs.com/)**: Framework minimalista para Node.js, facilitando a criação de APIs RESTful com roteamento eficiente.
+- **[![MongoDB](https://img.shields.io/badge/MongoDB-6.x-brightgreen)](https://www.mongodb.com/)**: Banco de dados NoSQL orientado a documentos, ideal para armazenar dados flexíveis e escaláveis.
+- **[![Mongoose](https://img.shields.io/badge/Mongoose-7.x-orange)](https://mongoosejs.com/)**: Biblioteca ODM (Object Data Modeling) para MongoDB e Node.js, proporcionando uma solução baseada em esquemas para modelar os dados.
+- **[![Jest](https://img.shields.io/badge/Jest-29.x-red)](https://jestjs.io/)**: Framework de testes unitários, para assegurar a aplicação.
 
-- **Node.js**: Ambiente de execução JavaScript no lado do servidor, permitindo a construção de aplicações escaláveis e de alto desempenho.
-- **Express**: Framework minimalista para Node.js, facilitando a criação de APIs RESTful com roteamento eficiente.
-- **MongoDB**: Banco de dados NoSQL orientado a documentos, ideal para armazenar dados flexíveis e escaláveis.
-- **Mongoose**: Biblioteca ODM (Object Data Modeling) para MongoDB e Node.js, proporcionando uma solução baseada em esquemas para modelar os dados.
+## 📦 Requisitos
+
+- [Node.js](https://nodejs.org/) v18.x ou superior
+- [MongoDB](https://www.mongodb.com/) v6.x ou superior
 
 ## 📦 Instalação
 
@@ -40,10 +45,48 @@ PORT=5000
   A API estará disponível em http://localhost:5000.
 
 ## 🧩 Funcionalidades
-- Cadastro de notícias: Permite adicionar novas notícias ao sistema.
-- Edição de notícias: Facilita a atualização de informações de notícias existentes.
-- Exclusão de notícias: Oferece a possibilidade de remover notícias do sistema.
-- Listagem de notícias: Exibe as notícias cadastradas de forma organizada.
+- Criação de notícias
+- Leitura de todas as notícias
+- Leitura de uma notícia específica por ID
+- Atualização de notícias por ID
+- Exclusão de notícias por ID
+- Seed inicial do banco de dados a partir de um arquivo `noticias.json`
+- Testes unitários utilizando Jest
+
+## 🧪 Testes
+Os testes unitários foram implementados utilizando o Jest. Para executá-los:
+
+```bash
+npm test
+```
+Os testes estão localizados na pasta tests/ e cobrem as operações CRUD das notícias.
+
+📂 Estrutura do Projeto
+```pgsql
+gerenciador-noticias-backend/
+├── src/
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   ├── services/
+│   └── app.js
+├── tests/
+├── noticias.json
+├── seed.js
+├── .env
+├── .gitignore
+├── package.json
+└── README.md
+```
+## 🧱 Design Pattern
+O projeto segue o padrão de arquitetura MVC (Model-View-Controller), promovendo uma separação clara entre as responsabilidades:
+
+Model: Define a estrutura dos dados e a interação com o banco de dados.
+
+Controller: Lida com as requisições e respostas da API.
+
+Routes: Define as rotas da aplicação e associações com os controllers.
+
 
 ## 🔗 Repositório Front-End
 O front-end deste projeto está disponível em: https://github.com/igorsfugiwara/gerenciador-de-noticias .
